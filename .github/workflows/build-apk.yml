@@ -22,23 +22,36 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          packages: tools platform-tools platforms;android-35 build-tools;35.0.0
-
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build signed release APK
-        run: chmod +x ./gradlew && ./gradlew :app:assembleRelease --stacktrace
+      - name: Grant execute permission to gradlew
+        run: chmod +x ./gradlew
 
-      - name: Rename APK
-        run: mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/G2-calculator.apk
+      - name: Build debug APK
+        run: ./gradlew :app:assembleDebug --stacktrace
 
-      - name: Upload APK
+      - name: Check release keystore
+        id: signing
+        run: |
+          store_file=""
+          if [ -f keystore.properties ]; then
+            store_file=$(grep '^storeFile=' keystore.properties | cut -d= -f2- | tr -d '\r')
+          fi
+          if [ -n "$store_file" ] && [ -f "$store_file" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "서명 열쇠가 없어 릴리스 빌드는 건너뜁니다."
+          fi
+
+      - name: Build release APK
+        if: steps.signing.outputs.present == 'true'
+        run: ./gradlew :app:assembleRelease --stacktrace
+
+      - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: G2-calculator
-          path: app/build/outputs/apk/release/G2-calculator.apk
+          name: g2g2-Debug-APK
+          path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error

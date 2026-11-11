@@ -23,10 +23,10 @@ git remote add origin https://github.com/사용자이름/저장소이름.git
 git push -u origin main
 ```
 
-3. GitHub 저장소의 **Actions** 탭에서 **Build APK** 가 끝날 때까지 기다립니다. 첫 빌드는 SDK를 받아서 몇 분 걸립니다.
-4. 완료된 실행을 열고, 아래 **Artifacts** 에서 `G2-calculator` 를 받습니다. 압축을 풀면 `G2-calculator.apk` 가 있습니다.
+3. GitHub 저장소의 **Actions** 탭에서 **Build APK** 가 끝날 때까지 기다립니다.
+4. 완료된 실행을 열고, 아래 **Artifacts** 에서 `g2g2-Debug-APK` 를 받습니다. 압축을 풀면 바로 설치할 수 있는 디버그 APK가 있습니다.
 5. 휴대폰으로 APK를 옮긴 뒤 설치합니다. 설치가 막히면 설정에서 이 출처의 앱 설치를 허용하면 됩니다.
 
 `main` 또는 `master`에 푸시할 때마다, 그리고 Actions 탭에서 **Run workflow** 를 눌러도 다시 빌드됩니다.
 
-서명 키는 `keystore/g2calc-release.p12` 입니다. 같은 키로 서명된 APK만 기존 앱 위에 업데이트됩니다. Play 스토어에 올릴 계획이 있으면 이 키를 공개 저장소에 두지 말고, 새 키를 만들어 GitHub Secrets로 바꾸세요.
+서명 열쇠 파일이 없으면 릴리스 빌드는 실패하지 않고 건너뜁니다. 설치는 디버그 APK로 하면 됩니다.

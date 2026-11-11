@@ -11,6 +11,8 @@ val keystoreProperties = Properties().apply {
         file.inputStream().use { load(it) }
     }
 }
+val releaseKeystore = keystoreProperties.getProperty("storeFile")?.let { rootProject.file(it) }
+val hasReleaseKeystore = releaseKeystore?.isFile == true
 
 android {
     namespace = "io.github.gguntt.g2calc"
@@ -25,19 +27,23 @@ android {
     }
 
     signingConfigs {
-        create("release") {
-            storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
-            storePassword = keystoreProperties.getProperty("storePassword")
-            keyAlias = keystoreProperties.getProperty("keyAlias")
-            keyPassword = keystoreProperties.getProperty("keyPassword")
-            storeType = "pkcs12"
+        if (hasReleaseKeystore) {
+            create("release") {
+                storeFile = releaseKeystore
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+                storeType = "pkcs12"
+            }
         }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("release")
+            if (hasReleaseKeystore) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 
